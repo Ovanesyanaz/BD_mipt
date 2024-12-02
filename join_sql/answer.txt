@@ -1,0 +1,81 @@
+1)
+подзапрос
+SELECT SUM(UnitPrice * Quantity) AS TotalSales
+FROM sales_items WHERE SalesId IN (
+    SELECT SalesId FROM sales
+    WHERE ShipCountry = 'USA' AND SalesDate BETWEEN '2012-01-01' AND '2012-03-31'
+);
+join 
+SELECT SUM(UnitPrice * Quantity) AS TotalSales
+FROM sales_items 
+    JOIN sales ON sales_items.SalesId = sales.SalesId
+    WHERE sales.ShipCountry = "USA" AND sales.SalesDate BETWEEN '2012-01-01' AND '2012-03-31'
+);
+2)
+подзапрос
+SELECT DISTINCT FirstName
+FROM customers WHERE FirstName not in (SELECT FirstName FROM employees)
+
+join
+SELECT DISTINCT customers.FirstName
+FROM customers LEFT JOIN employees ON 
+customers.FirstName = employees.FirstName WHERE employees.FirstName is NULL
+
+3)
+в первом случае результат больше, второй случай сужает результат первого
+после фильтрации результаты сравняются по длине
+
+4)
+подзапрос
+SELECT AlbumId, COUNT(*) AS TrackCount
+FROM tracks
+GROUP BY AlbumId
+ORDER BY AlbumId;
+
+join 
+SELECT a.Title, COUNT(t.TrackId) AS TrackCount
+FROM albums a
+LEFT JOIN tracks t ON a.AlbumId = t.AlbumId
+GROUP BY a.Title, a.AlbumId
+ORDER BY a.AlbumId;
+
+5)
+join 
+SELECT customers.FirstName, customers.LastName
+FROM customers JOIN sales ON 
+customers.CustomerId = sales.CustomerId AND 
+strftime("%Y", sales.SalesDate) = "2009" AND 
+sales.ShipCity = "Berlin"
+
+6)
+join 
+SELECT c.LastName
+FROM customers c
+JOIN sales s ON c.CustomerId = s.CustomerId
+JOIN sales_items si ON s.SalesId = si.SalesId
+GROUP BY c.CustomerId, c.LastName
+HAVING SUM(si.Quantity) > 30;
+
+подзапрос
+SELECT c.LastName
+FROM customers c
+JOIN (
+    SELECT s.CustomerId, SUM(si.Quantity) AS TotalQuantity
+    FROM sales s
+    JOIN sales_items si ON s.SalesId = si.SalesId
+    GROUP BY s.CustomerId
+    HAVING SUM(si.Quantity) > 30
+) AS CustomerTotals ON c.CustomerId = CustomerTotals.CustomerId;
+
+7)
+SELECT genres.Name, AVG(tracks.UnitPrice) as AveragePrice
+FROM genres, tracks
+WHERE tracks.GenreId == genres.GenreId
+GROUP BY genres.GenreId
+
+8)
+SELECT genres.Name
+FROM genres, tracks
+WHERE tracks.GenreId == genres.GenreId
+GROUP BY genres.GenreId
+HAVING AVG(tracks.UnitPrice) > 1
