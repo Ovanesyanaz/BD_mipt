@@ -1,13 +1,28 @@
-CREATE table USERS (
-    user_id INTEGER UNIQUE PRIMARY KEY NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    geo TEXT NOT NULL
-);
-
-CREATE table LOG (
-    user_id INTEGER,
-    FOREIGN KEY (user_id) REFERENCES User(user_id),
-    time TEXT NOT NULL PRIMARY KEY,
+CREATE TABLE LOG_DIRTY (
+    log_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT,
+    time TEXT,
     bet INTEGER,
     win INTEGER
+);
+
+CREATE TABLE USERS_DIRTY (
+    user_id TEXT PRIMARY KEY,
+    email TEXT,
+    geo TEXT
+);
+
+CREATE TABLE LOG (
+    log_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    time TEXT NOT NULL,
+    bet INTEGER NOT NULL,
+    win INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES USERS(user_id)
+);
+
+CREATE TABLE USERS (
+    user_id INTEGER PRIMARY KEY,
+    email TEXT NOT NULL,
+    geo TEXT NOT NULL
 );
